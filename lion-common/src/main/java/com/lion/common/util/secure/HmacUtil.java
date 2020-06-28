@@ -49,58 +49,141 @@ public class HmacUtil {
     private static final String ENCODEING = "UTF-8";
 
     /**
-     * HMAC MD5 加密
+     * 默认秘钥，必须16位
      */
-    public static String encryptHmacMD5(String data, String key) {
-        return encryptHmac(data, key, HMAC_MD5);
+    private static final String DEFAULT_KEY = "MkI3I1YlFOFr57YL";
+
+    /**
+     * HMAC MD5 加密
+     *
+     * @param text 明文
+     * @return 密文
+     */
+    public static String encryptHmacMD5(String text) {
+        return encryptHmac(text, DEFAULT_KEY, HMAC_MD5);
     }
 
     /**
      * HMAC SHA1 加密
+     *
+     * @param text 明文
+     * @return 密文
      */
-    public static String encryptHmacSHA1(String data, String key) {
-        return encryptHmac(data, key, HMAC_SHA1);
+    public static String encryptHmacSHA1(String text) {
+        return encryptHmacSHA1(text, DEFAULT_KEY);
+    }
+
+    /**
+     * HMAC SHA1 加密
+     *
+     * @param text 明文
+     * @param key  秘钥
+     * @return 密文
+     */
+    public static String encryptHmacSHA1(String text, String key) {
+        return encryptHmac(text, key, HMAC_SHA1);
     }
 
     /**
      * HMAC SHA224 加密
+     *
+     * @param text 明文
+     * @return 密文
      */
-    public static String encryptHmacSHA224(String data, String key) {
-        return encryptHmac(data, key, HMAC_SHA224);
+    public static String encryptHmacSHA224(String text) {
+        return encryptHmacSHA224(text, DEFAULT_KEY);
+    }
+
+    /**
+     * HMAC SHA224 加密
+     *
+     * @param text 明文
+     * @param key  秘钥
+     * @return 密文
+     */
+    public static String encryptHmacSHA224(String text, String key) {
+        return encryptHmac(text, key, HMAC_SHA224);
+    }
+
+    /**
+     * HMAC SHA2564 加密
+     *
+     * @param text 明文
+     * @return 密文
+     */
+    public static String encryptHmacSHA256(String text) {
+        return encryptHmacSHA256(text, DEFAULT_KEY);
     }
 
     /**
      * HMAC SHA256 加密
+     *
+     * @param text 明文
+     * @param key  秘钥
+     * @return 密文
      */
-    public static String encryptHmacSHA256(String data, String key) {
-        return encryptHmac(data, key, HMAC_SHA256);
+    public static String encryptHmacSHA256(String text, String key) {
+        return encryptHmac(text, key, HMAC_SHA256);
     }
 
     /**
      * HMAC SHA384 加密
+     *
+     * @param text 明文
+     * @return 密文
      */
-    public static String encryptHmacSHA384(String data, String key) {
-        return encryptHmac(data, key, HMAC_SHA384);
+    public static String encryptHmacSHA384(String text) {
+        return encryptHmacSHA384(text, DEFAULT_KEY);
+    }
+
+    /**
+     * HMAC SHA384 加密
+     *
+     * @param text 明文
+     * @param key  秘钥
+     * @return 密文
+     */
+    public static String encryptHmacSHA384(String text, String key) {
+        return encryptHmac(text, key, HMAC_SHA384);
     }
 
     /**
      * HMAC SHA521 加密
+     *
+     * @param text 明文
+     * @return 密文
      */
-    public static String encryptHmacSHA512(String data, String key) {
-        return encryptHmac(data, key, HMAC_SHA512);
+    public static String encryptHmacSHA512(String text) {
+        return encryptHmacSHA512(text, DEFAULT_KEY);
     }
 
     /**
-     * 基础HMAC算法
+     * HMAC SHA521 加密
+     *
+     * @param text 明文
+     * @param key  秘钥
+     * @return 密文
      */
-    private static String encryptHmac(String data, String key, String type) {
-        if (StringUtils.isEmpty(data) || StringUtils.isEmpty(key) || StringUtils.isEmpty(type)) {
+    public static String encryptHmacSHA512(String text, String key) {
+        return encryptHmac(text, key, HMAC_SHA512);
+    }
+
+    /**
+     * HMAC 加密基本算法
+     *
+     * @param text 明文
+     * @param key  秘钥
+     * @param type 类型
+     * @return 密文
+     */
+    private static String encryptHmac(String text, String key, String type) {
+        if (StringUtils.isEmpty(text) || StringUtils.isEmpty(key) || StringUtils.isEmpty(type)) {
             return null;
         }
         try {
             // byte[] key = getHmacKey(type);   // 随机生成秘钥
             byte[] keyBytes = key.getBytes(ENCODEING);
-            byte[] dataBytes = data.getBytes(ENCODEING);
+            byte[] dataBytes = text.getBytes(ENCODEING);
 
             // 1、还原密钥
             SecretKey secretKey = new SecretKeySpec(keyBytes, type);
@@ -120,7 +203,10 @@ public class HmacUtil {
     }
 
     /**
-     * HMAC Key
+     * HMAC Key 获取
+     *
+     * @param type 类型
+     * @return 字节流key
      */
     private static byte[] getHmacKey(String type) {
         try {
@@ -139,6 +225,10 @@ public class HmacUtil {
 
     /**
      * 数据转16进制编码
+     *
+     * @param data        数据流
+     * @param toLowerCase 是否转小写
+     * @return 16进制编码字符
      */
     private static String encodeHex(final byte[] data, final boolean toLowerCase) {
         final char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};

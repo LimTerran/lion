@@ -51,9 +51,9 @@ public abstract class BaseController extends ApplicationObjectSupport {
     protected String port;
 
     /**
-     * 应用名称（默认：lion-unknown）
+     * 应用名称（默认：unknown）
      */
-    @Value("${spring.application.name}")
+    @Value("${spring.application.name:unknown}")
     protected String applicationName;
 
     /**
@@ -77,14 +77,19 @@ public abstract class BaseController extends ApplicationObjectSupport {
         return this.getApplicationContext().getBean(name);
     }
 
+    /**
+     * 是否Ajax请求
+     * @param request 请求对象
+     */
     protected boolean isAjaxRequest(HttpServletRequest request) {
-        if (!(request.getHeader("Accept").contains("application/json")
+        boolean isAjax = request.getHeader("Accept").contains("application/json")
                 || (request.getHeader("X-Requested-With") != null
                 && request.getHeader("X-Requested-With").contains("XMLHttpRequest"))
-                || "XMLHttpRequest".equalsIgnoreCase(request.getParameter("X_REQUESTED_WITH")))) {
-            return false;
+                || "XMLHttpRequest".equalsIgnoreCase(request.getParameter("X_REQUESTED_WITH"));
+        if (isAjax) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -129,6 +134,8 @@ public abstract class BaseController extends ApplicationObjectSupport {
 
     /**
      * 文件上传（支持多个文件上传）
+     *
+     * @param request 请求对象
      */
     protected List<String> fileUpload(HttpServletRequest request) {
 

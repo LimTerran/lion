@@ -42,15 +42,15 @@ public class DistributedLockerAspect {
     @Autowired
     private DistributedLocker distributedLocker;
 
+    /**
+     * 切面表达式
+     */
     @Pointcut("@annotation(com.lion.common.lock.annotation.Locker)")
     public void lockerPointCut() {
     }
 
     /**
      * 环绕通知
-     *
-     * @param proceedingJoinPoint
-     * @return
      */
     @Around("lockerPointCut()")
     public Object aroundMethod(ProceedingJoinPoint proceedingJoinPoint) {
@@ -76,7 +76,8 @@ public class DistributedLockerAspect {
                 log.error(throwable.getMessage(), throwable);
                 result = throwable.getMessage();
             } finally {
-                distributedLocker.unlock(lockKey);  // 释放锁
+                // 释放锁
+                distributedLocker.unlock(lockKey);
             }
         } else {
             String msg = "分布式锁获取失败/超时";

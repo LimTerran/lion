@@ -36,24 +36,36 @@ public class Base64Util {
      */
     private static final String ENCODEING = "UTF-8";
 
-    public static String encode(String data) {
-        if (StringUtils.isEmpty(data)) {
+    /**
+     * Base64 编码
+     *
+     * @param text 明文
+     * @return 密文
+     */
+    public static String encode(String text) {
+        if (StringUtils.isEmpty(text)) {
             return null;
         }
         try {
-            return Base64.getEncoder().encodeToString(data.getBytes(ENCODEING));
+            return Base64.getEncoder().encodeToString(text.getBytes(ENCODEING));
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage(), e);
         }
         return null;
     }
 
-    public static String decode(String data) {
-        if (StringUtils.isEmpty(data)) {
+    /**
+     * Base64 解码
+     *
+     * @param ciphertext 密文
+     * @return 明文
+     */
+    public static String decode(String ciphertext) {
+        if (StringUtils.isEmpty(ciphertext)) {
             return null;
         }
         try {
-            final byte[] decode = Base64.getDecoder().decode(data);
+            final byte[] decode = Base64.getDecoder().decode(ciphertext);
             return new String(decode, ENCODEING);
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage(), e);

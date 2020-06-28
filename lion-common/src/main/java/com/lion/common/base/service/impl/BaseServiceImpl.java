@@ -33,16 +33,31 @@ import java.util.List;
  * @author Yanzheng (https://github.com/micyo202)
  * @date 2020/2/12
  */
-public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements BaseService<T> {
+public abstract class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, T> implements BaseService<T> {
 
     @Autowired
-    SqlSessionTemplate sqlSessionTemplate;
+    protected SqlSessionTemplate sqlSessionTemplate;
 
+    /**
+     * 分页查询
+     *
+     * @param pageNum  页码值
+     * @param pageSize 每页大小
+     * @return PageInfo 分页对象
+     */
     @Override
     public PageInfo<T> page(int pageNum, int pageSize) {
         return page(pageNum, pageSize, null);
     }
 
+    /**
+     * 分页查询
+     *
+     * @param pageNum  页码值
+     * @param pageSize 每页大小
+     * @param orderBy  排序字段
+     * @return PageInfo 分页对象
+     */
     @Override
     public PageInfo<T> page(int pageNum, int pageSize, String orderBy) {
         if (null == orderBy) {
@@ -57,11 +72,28 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         return pageInfo;
     }
 
+    /**
+     * 分页查询
+     *
+     * @param queryWrapper 条件构造器
+     * @param pageNum      页码值
+     * @param pageSize     每页大小
+     * @return PageInfo 分页对象
+     */
     @Override
     public PageInfo<T> page(Wrapper<T> queryWrapper, int pageNum, int pageSize) {
         return page(queryWrapper, pageNum, pageSize, null);
     }
 
+    /**
+     * 分页查询
+     *
+     * @param queryWrapper 条件构造器
+     * @param pageNum      页码值
+     * @param pageSize     每页大小
+     * @param orderBy      排序字段
+     * @return PageInfo 分页对象
+     */
     @Override
     public PageInfo<T> page(Wrapper<T> queryWrapper, int pageNum, int pageSize, String orderBy) {
         if (null == orderBy) {
@@ -76,30 +108,66 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         return pageInfo;
     }
 
+    /**
+     * 分页查询
+     *
+     * @param statement Mapper声明
+     * @param pageNum   页码值
+     * @param pageSize  每页大小
+     * @return PageInfo 分页对象
+     */
     @Override
-    public PageInfo page(String statement, int pageNum, int pageSize) {
+    public PageInfo<T> page(String statement, int pageNum, int pageSize) {
         return page(statement, null, pageNum, pageSize, null);
     }
 
+    /**
+     * 分页查询
+     *
+     * @param statement Mapper声明
+     * @param pageNum   页码值
+     * @param pageSize  每页大小
+     * @param orderBy   排序字段
+     * @return PageInfo 分页对象
+     */
     @Override
-    public PageInfo page(String statement, int pageNum, int pageSize, String orderBy) {
+    public PageInfo<T> page(String statement, int pageNum, int pageSize, String orderBy) {
         return page(statement, null, pageNum, pageSize, orderBy);
     }
 
+    /**
+     * 分页查询
+     *
+     * @param statement Mapper声明
+     * @param parameter 参数
+     * @param pageNum   页码值
+     * @param pageSize  每页大小
+     * @return PageInfo 分页对象
+     */
     @Override
-    public PageInfo page(String statement, Object parameter, int pageNum, int pageSize) {
+    public PageInfo<T> page(String statement, Object parameter, int pageNum, int pageSize) {
         return page(statement, parameter, pageNum, pageSize, null);
     }
 
+    /**
+     * 分页查询
+     *
+     * @param statement Mapper声明
+     * @param parameter 参数
+     * @param pageNum   页码值
+     * @param pageSize  每页大小
+     * @param orderBy   排序字段
+     * @return PageInfo 分页对象
+     */
     @Override
-    public PageInfo page(String statement, Object parameter, int pageNum, int pageSize, String orderBy) {
+    public PageInfo<T> page(String statement, Object parameter, int pageNum, int pageSize, String orderBy) {
         if (null == orderBy) {
             PageHelper.startPage(pageNum, pageSize);
         } else {
             PageHelper.startPage(pageNum, pageSize, orderBy);
         }
 
-        List<Object> list;
+        List<T> list;
 
         if (null == parameter) {
             list = sqlSessionTemplate.selectList(statement);
@@ -107,16 +175,29 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
             list = sqlSessionTemplate.selectList(statement, parameter);
         }
 
-        PageInfo pageInfo = new PageInfo<>(list);
+        PageInfo<T> pageInfo = new PageInfo<>(list);
 
         return pageInfo;
     }
 
+    /**
+     * 查询单个对象
+     *
+     * @param statement Mapper声明
+     * @return T 对象
+     */
     @Override
     public T getByStatement(String statement) {
         return getByStatement(statement, null);
     }
 
+    /**
+     * 查询单个对象
+     *
+     * @param statement Mapper声明
+     * @param parameter 参数
+     * @return T 对象
+     */
     @Override
     public T getByStatement(String statement, Object parameter) {
         if (null == parameter) {
@@ -126,11 +207,24 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         }
     }
 
+    /**
+     * 查询对象集合
+     *
+     * @param statement Mapper声明
+     * @return List 对象集合
+     */
     @Override
     public List<T> listByStatement(String statement) {
         return listByStatement(statement, null);
     }
 
+    /**
+     * 查询对象集合
+     *
+     * @param statement Mapper声明
+     * @param parameter 参数
+     * @return List 对象集合
+     */
     @Override
     public List<T> listByStatement(String statement, Object parameter) {
         if (null == parameter) {
@@ -140,11 +234,24 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         }
     }
 
+    /**
+     * 保存
+     *
+     * @param statement Mapper声明
+     * @return int 保存条数
+     */
     @Override
     public int saveByStatement(String statement) {
         return saveByStatement(statement, null);
     }
 
+    /**
+     * 保存
+     *
+     * @param statement Mapper声明
+     * @param parameter 参数
+     * @return int 保存条数
+     */
     @Override
     public int saveByStatement(String statement, Object parameter) {
         if (null == parameter) {
@@ -154,11 +261,24 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T> extends ServiceImpl<M, 
         }
     }
 
+    /**
+     * 修改
+     *
+     * @param statement Mapper声明
+     * @return int 更新条数
+     */
     @Override
     public int updateByStatement(String statement) {
         return updateByStatement(statement, null);
     }
 
+    /**
+     * 修改
+     *
+     * @param statement Mapper声明
+     * @param parameter 参数
+     * @return int 更新条数
+     */
     @Override
     public int updateByStatement(String statement, Object parameter) {
         if (null == parameter) {

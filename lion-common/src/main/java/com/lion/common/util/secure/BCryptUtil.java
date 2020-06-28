@@ -15,8 +15,8 @@
  */
 package com.lion.common.util.secure;
 
+import jodd.crypt.BCrypt;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 
 /**
  * BCryptUtil
@@ -27,27 +27,30 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
  */
 public class BCryptUtil {
 
-    public static String encrypt(String password) {
-        if (StringUtils.isEmpty(password)) {
+    /**
+     * BCrypt 加密
+     *
+     * @param text 明文
+     * @return 密文
+     */
+    public static String encrypt(String text) {
+        if (StringUtils.isEmpty(text)) {
             return null;
         }
-        return BCrypt.hashpw(password, BCrypt.gensalt());
+        return BCrypt.hashpw(text, BCrypt.gensalt());
     }
 
-    public static boolean verify(String candidate, String encrypt) {
-        if (StringUtils.isEmpty(candidate) || StringUtils.isEmpty(encrypt)) {
+    /**
+     * BCrypt 校验
+     *
+     * @param text       明文
+     * @param ciphertext 密文
+     * @return 是否正确
+     */
+    public static boolean verify(String text, String ciphertext) {
+        if (StringUtils.isEmpty(text) || StringUtils.isEmpty(ciphertext)) {
             return false;
         }
-        return BCrypt.checkpw(candidate, encrypt);
+        return BCrypt.checkpw(text, ciphertext);
     }
-
-    public static void main(String[] args) {
-        String password = "Yanzheng -> github.com/micyo202";
-        String encrypt = BCryptUtil.encrypt(password);
-        boolean verify = BCryptUtil.verify(password, encrypt);
-        System.out.println("原文：" + password);
-        System.out.println("加密后：" + encrypt);
-        System.out.println("验证结果：" + verify);
-    }
-
 }

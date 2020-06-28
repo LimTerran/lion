@@ -19,7 +19,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageInfo;
 import com.lion.common.base.controller.BaseController;
 import com.lion.common.result.Result;
-import com.lion.common.result.ResultPage;
 import com.lion.common.util.DateUtil;
 import com.lion.demo.consumer.entity.TempMybatis;
 import com.lion.demo.consumer.service.TempMybatisService;
@@ -33,10 +32,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * TempMybatisController
- * TODO
+ * Mybatis示例
  *
  * @author Yanzheng (https://github.com/micyo202)
  * @date 2019/04/15
@@ -54,7 +54,7 @@ public class TempMybatisController extends BaseController {
     @ApiParam(name = "num", value = "插入数据条数", defaultValue = "5", required = true)
     @RequestMapping(value = "/save/{num}", method = {RequestMethod.GET, RequestMethod.POST})
     @Transactional
-    public Result save(@PathVariable int num) {
+    public Result<String> save(@PathVariable int num) {
 
         if (0 >= num) {
             return Result.failure("[num] 参数不正确，取值范围必须大于 0 的整数（例：/save/3）");
@@ -75,10 +75,25 @@ public class TempMybatisController extends BaseController {
                 tempMybatis.setId(DateUtil.getTimestamp());
             } else {
                 //主键冲突，触发事务回滚
-                tempMybatis.setId(new Long(1));
+                tempMybatis.setId(1L);
             }
 
             // 若使用 Try Catch 需要手动回滚事务：TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+            // 纯手动方式控制事务
+            /*
+            @Autowired
+            DataSourceTransactionManager dataSourceTransactionManager;
+            @Autowired
+            TransactionDefinition transactionDefinition;
+            // 手动开启事务
+            TransactionStatus transactionStatus = dataSourceTransactionManager.getTransaction(transactionDefinition);
+            // 手动提交事务
+            dataSourceTransactionManager.commit(transactionStatus);
+            // 手动回滚事务
+            dataSourceTransactionManager.rollback(transactionStatus);
+            */
+
             tempMybatisService.save(tempMybatis);
         }
         return Result.success("temp_mybatis 数据保存成功，执行条数：" + num);
@@ -86,7 +101,7 @@ public class TempMybatisController extends BaseController {
 
     @ApiOperation("Mybatis自定义SQL方式查询")
     @RequestMapping(value = "/custom/sql", method = {RequestMethod.GET, RequestMethod.POST})
-    public Result customSql() {
+    public Result<List<TempMybatis>> customSql() {
         return Result.success(tempMybatisService.listByCustomSql());
     }
 
@@ -97,11 +112,11 @@ public class TempMybatisController extends BaseController {
             @ApiImplicitParam(name = "pageSize", value = "每页条数", defaultValue = "3", dataType = "String")
     })
     @RequestMapping(value = "/page/{version}/{pageNum}/{pageSize}", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResultPage page(@PathVariable String version, @PathVariable int pageNum, @PathVariable int pageSize) {
+    public Result<PageInfo<TempMybatis>> page(@PathVariable String version, @PathVariable int pageNum, @PathVariable int pageSize) {
 
         String statement = "com.lion.demo.consumer.mapper.TempMybatisMapper.listByCustomSql";
 
-        PageInfo pageInfo;
+        PageInfo<TempMybatis> pageInfo;
 
         String orderBy = "name DESC,id ASC";
 
@@ -133,9 +148,9 @@ public class TempMybatisController extends BaseController {
         }
 
         if (null == pageInfo) {
-            return ResultPage.failure("[version] 参数不正确，取值范围应为：v1~v6（例：/page/v1/1/10）");
+            return Result.failure("[version] 参数不正确，取值范围应为：v1~v6（例：/page/v1/1/10）");
         } else {
-            return ResultPage.success(pageInfo);
+            return Result.success(pageInfo);
         }
 
     }

@@ -18,11 +18,12 @@ package com.lion.common.result;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.lion.common.constant.ResponseCode;
 import com.lion.common.constant.ResponseStatus;
+import com.lion.common.tuple.Tuple2;
 import com.lion.common.util.DateUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -30,13 +31,13 @@ import java.util.Map;
 
 /**
  * Result
- * 结果实体类
+ * 结果实体
  *
  * @author Yanzheng (https://github.com/micyo202)
  * @date 2019/04/13
  */
-@ToString
-@NoArgsConstructor
+@Data
+@Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(value = "结果实体类")
 public class Result<T> implements Serializable {
@@ -45,13 +46,19 @@ public class Result<T> implements Serializable {
      * 状态值
      */
     @ApiModelProperty(value = "状态值")
-    private int code = ResponseCode.SUCCESS;
+    private int code;
 
     /**
      * 提示信息
      */
     @ApiModelProperty(value = "提示信息")
-    private String msg = "Success";
+    private String msg;
+
+    /**
+     * 时间戳
+     */
+    @ApiModelProperty(value = "时间戳")
+    private long timestamp;
 
     /**
      * 数据
@@ -60,68 +67,16 @@ public class Result<T> implements Serializable {
     private T data;
 
     /**
-     * 时间戳
-     */
-    @ApiModelProperty(value = "时间戳")
-    private long timestamp = DateUtil.getTimestamp();
-
-    /**
      * 额外扩展数据
      */
-    //@JsonIgnore
     @ApiModelProperty(value = "额外扩展数据")
     private Map<String, Object> extra = null;
 
     /**
-     * 自定义相关getter、setter方法
-     */
-    public int getCode() {
-        return code;
-    }
-
-    public Result<T> setCode(int code) {
-        this.code = code;
-        return this;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public Result<T> setMsg(String msg) {
-        this.msg = msg;
-        return this;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public Result<T> setData(T data) {
-        this.data = data;
-        return this;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public Result<T> setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-        return this;
-    }
-
-    public Map<String, Object> getExtra() {
-        return extra;
-    }
-
-    public Result<T> setExend(Map<String, Object> extra) {
-        this.extra = extra;
-        return this;
-    }
-
-    /**
-     * 自定义扩展方法
+     * 添加扩展数据
+     *
+     * @param key   键
+     * @param value 值
      */
     public Result<T> addExtra(String key, Object value) {
         if (null == this.extra) {
@@ -131,48 +86,90 @@ public class Result<T> implements Serializable {
         return this;
     }
 
-    public Result<T> setStatus(ResponseStatus responseStatus) {
-        this.setCode(responseStatus.code());
-        this.setMsg(responseStatus.msg());
+    /**
+     * 添加扩展数据
+     *
+     * @param tuple 元组
+     */
+    public Result<T> addExtra(Tuple2 tuple) {
+        if (null == this.extra) {
+            this.extra = new HashMap<>(8);
+        }
+        this.extra.put(tuple._1().toString(), tuple._2());
         return this;
     }
 
-    public static Result status(ResponseStatus responseStatus) {
-        Result result = new Result();
+    /**
+     * 设置状态
+     *
+     * @param responseStatus 响应状态
+     */
+    public static <T> Result<T> status(ResponseStatus responseStatus) {
+        Result<T> result = new Result<>();
         result.setCode(responseStatus.code());
         result.setMsg(responseStatus.msg());
         return result;
     }
 
-    public static Result success() {
-        return new Result();
+    /**
+     * 成功
+     */
+    public static <T> Result<T> success() {
+        return success(null, null);
     }
 
-    public static <T> Result success(T data) {
-        Result result = new Result();
-        result.setData(data);
+    /**
+     * 成功
+     *
+     * @param data 数据对象
+     */
+    public static <T> Result<T> success(T data) {
+        return success(data, null);
+    }
+
+    /**
+     * 成功
+     *
+     * @param data  数据对象
+     * @param extra 扩展数据
+     */
+    public static <T> Result<T> success(T data, Map<String, Object> extra) {
+        Result<T> result = new Result<>();
+        result.setCode(ResponseCode.SUCCESS)
+                .setMsg(ResponseStatus.SUCCESS.msg())
+                .setTimestamp(DateUtil.getTimestamp())
+                .setData(data)
+                .setExtra(extra);
         return result;
     }
 
-    public static <T> Result success(T data, Map<String, Object> extra) {
-        Result result = new Result();
-        result.setData(data);
-        result.setExend(extra);
-        return result;
+    /**
+     * 失败
+     */
+    public static <T> Result<T> failure() {
+        return failure(ResponseCode.FAILURE, ResponseStatus.FAILURE.msg());
     }
 
-    public static Result failure(String msg) {
-        Result result = new Result();
-        result.setCode(ResponseCode.FAILURE);
-        result.setMsg(msg);
-        return result;
+    /**
+     * 失败
+     *
+     * @param msg 提示信息
+     */
+    public static <T> Result<T> failure(String msg) {
+        return failure(ResponseCode.FAILURE, msg);
     }
 
-    public static Result failure(int code, String msg) {
-        Result result = new Result();
-        result.setCode(code);
-        result.setMsg(msg);
+    /**
+     * 失败
+     *
+     * @param code 编码
+     * @param msg  提示信息
+     */
+    public static <T> Result<T> failure(int code, String msg) {
+        Result<T> result = new Result<>();
+        result.setCode(code)
+                .setMsg(msg)
+                .setTimestamp(DateUtil.getTimestamp());
         return result;
     }
-
 }
