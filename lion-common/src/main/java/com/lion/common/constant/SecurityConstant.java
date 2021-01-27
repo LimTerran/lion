@@ -22,20 +22,39 @@ package com.lion.common.constant;
  * @author Yanzheng (https://github.com/micyo202)
  * @date 2020/3/17
  */
-public interface SecurityConstant {
+public final class SecurityConstant {
 
-    String OAUTH_URL = "/oauth/";
+    private SecurityConstant() {}
 
-    String ACCESS_TOKEN = "Authorization";
+    /**
+     * 登录url
+     */
+    public static final String LOGIN_URL = "/login";
 
-    String BEARER_PREFIX = "Bearer ";
+    /**
+     * 认证url
+     */
+    public static final String OAUTH_URL = "/oauth/";
 
-    String ACCESS_PREFIX = "access:";
+    /**
+     * token 名称
+     */
+    public static final String ACCESS_TOKEN = "Authorization";
+
+    /**
+     * bearer 前缀
+     */
+    public static final String BEARER_PREFIX = "Bearer ";
+
+    /**
+     * access 前缀
+     */
+    public static final String ACCESS_PREFIX = "access:";
 
     /**
      * 系统固定不进行认证，直接放行的URL，供WebSecurityConfig、ResourceServerConfig公用
      */
-    String[] PATTERN_URLS = {
+    public static final String[] PATTERN_URLS = {
             "/actuator/**",
             "/druid/**",
 
@@ -46,5 +65,4 @@ public interface SecurityConstant {
             "/swagger-ui.html",
             "/doc.html"
     };
-
 }

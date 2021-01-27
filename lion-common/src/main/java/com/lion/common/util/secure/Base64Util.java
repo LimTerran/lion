@@ -18,7 +18,7 @@ package com.lion.common.util.secure;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
@@ -31,10 +31,7 @@ import java.util.Base64;
 @Slf4j
 public class Base64Util {
 
-    /**
-     * 字符编码
-     */
-    private static final String ENCODEING = "UTF-8";
+    private Base64Util() {}
 
     /**
      * Base64 编码
@@ -43,15 +40,10 @@ public class Base64Util {
      * @return 密文
      */
     public static String encode(String text) {
-        if (StringUtils.isEmpty(text)) {
+        if (StringUtils.isBlank(text)) {
             return null;
         }
-        try {
-            return Base64.getEncoder().encodeToString(text.getBytes(ENCODEING));
-        } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
+        return Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -61,16 +53,10 @@ public class Base64Util {
      * @return 明文
      */
     public static String decode(String ciphertext) {
-        if (StringUtils.isEmpty(ciphertext)) {
+        if (StringUtils.isBlank(ciphertext)) {
             return null;
         }
-        try {
-            final byte[] decode = Base64.getDecoder().decode(ciphertext);
-            return new String(decode, ENCODEING);
-        } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage(), e);
-        }
-        return null;
+        final byte[] decode = Base64.getDecoder().decode(ciphertext);
+        return new String(decode, StandardCharsets.UTF_8);
     }
-
 }

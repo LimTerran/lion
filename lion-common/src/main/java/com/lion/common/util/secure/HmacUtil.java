@@ -22,6 +22,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 
 /**
  * HmacUtil
@@ -33,6 +34,8 @@ import javax.crypto.spec.SecretKeySpec;
 @Slf4j
 public class HmacUtil {
 
+    private HmacUtil() {}
+
     /**
      * 加密、解密方式：SHA-1、SHA-224、SHA-256、SHA-384、SHA-512
      */
@@ -42,11 +45,6 @@ public class HmacUtil {
     private static final String HMAC_SHA256 = "HmacSHA256";
     private static final String HMAC_SHA384 = "HmacSHA384";
     private static final String HMAC_SHA512 = "HmacSHA512";
-
-    /**
-     * 字符编码
-     */
-    private static final String ENCODEING = "UTF-8";
 
     /**
      * 默认秘钥，必须16位
@@ -177,13 +175,13 @@ public class HmacUtil {
      * @return 密文
      */
     private static String encryptHmac(String text, String key, String type) {
-        if (StringUtils.isEmpty(text) || StringUtils.isEmpty(key) || StringUtils.isEmpty(type)) {
+        if (StringUtils.isAnyBlank(text, key, type)) {
             return null;
         }
         try {
             // byte[] key = getHmacKey(type);   // 随机生成秘钥
-            byte[] keyBytes = key.getBytes(ENCODEING);
-            byte[] dataBytes = text.getBytes(ENCODEING);
+            byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+            byte[] dataBytes = text.getBytes(StandardCharsets.UTF_8);
 
             // 1、还原密钥
             SecretKey secretKey = new SecretKeySpec(keyBytes, type);
@@ -243,5 +241,4 @@ public class HmacUtil {
         }
         return new String(out);
     }
-
 }

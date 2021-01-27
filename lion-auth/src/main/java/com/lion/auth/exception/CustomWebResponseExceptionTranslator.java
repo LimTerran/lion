@@ -54,11 +54,11 @@ public class CustomWebResponseExceptionTranslator implements WebResponseExceptio
 
         // 异常栈获取 CustomOAuth2Exception 异常
         Exception ase = (CustomOAuth2Exception) throwableAnalyzer.getFirstThrowableOfType(CustomOAuth2Exception.class, causeChain);
-        if (ase != null) {
+        if (null != ase) {
             return handleOAuth2Exception((CustomOAuth2Exception) ase);
         }
         ase = (AuthenticationException) throwableAnalyzer.getFirstThrowableOfType(AuthenticationException.class, causeChain);
-        if (ase != null) {
+        if (null != ase) {
             return handleOAuth2Exception(new CustomOAuth2Exception(ResponseCode.UNAUTHORIZED, ase.getMessage()));
         }
         ase = (AccessDeniedException) throwableAnalyzer.getFirstThrowableOfType(AccessDeniedException.class, causeChain);
@@ -104,8 +104,7 @@ public class CustomWebResponseExceptionTranslator implements WebResponseExceptio
         if (code == ResponseCode.UNAUTHORIZED || (e instanceof InsufficientScopeException)) {
             headers.set("WWW-Authenticate", String.format("%s %s", OAuth2AccessToken.BEARER_TYPE, e.getSummary()));
         }
-        ResponseEntity<CustomOAuth2Exception> response = new ResponseEntity(e, headers, HttpStatus.valueOf(code));
-        return response;
+        return new ResponseEntity(e, headers, HttpStatus.valueOf(code));
     }
 
 }

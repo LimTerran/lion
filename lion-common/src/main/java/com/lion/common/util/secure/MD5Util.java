@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 /**
@@ -31,21 +32,18 @@ import java.security.MessageDigest;
 @Slf4j
 public class MD5Util {
 
+    private MD5Util() {}
+
     /**
      * 加密、解密方式
      */
     private static final String MD5 = "MD5";
 
     /**
-     * 字符编码
-     */
-    private static final String ENCODEING = "UTF-8";
-
-    /**
      * MD5 加密方法
      */
     public static String encrypt(String text) {
-        if (StringUtils.isEmpty(text)) {
+        if (StringUtils.isBlank(text)) {
             return null;
         }
         /*
@@ -71,7 +69,7 @@ public class MD5Util {
         */
         try {
             MessageDigest messageDigest = MessageDigest.getInstance(MD5);
-            byte[] dataBytes = text.getBytes(ENCODEING);
+            byte[] dataBytes = text.getBytes(StandardCharsets.UTF_8);
             messageDigest.update(dataBytes);
             return new BigInteger(1, messageDigest.digest()).toString(16);
         } catch (Exception e) {
@@ -79,5 +77,4 @@ public class MD5Util {
         }
         return null;
     }
-
 }

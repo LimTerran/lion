@@ -27,6 +27,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class BCryptUtil {
 
+    private BCryptUtil() {}
+
     /**
      * BCrypt 加密
      *
@@ -34,7 +36,7 @@ public class BCryptUtil {
      * @return 密文
      */
     public static String encrypt(String text) {
-        if (StringUtils.isEmpty(text)) {
+        if (StringUtils.isBlank(text)) {
             return null;
         }
         return BCrypt.hashpw(text, BCrypt.gensalt());
@@ -48,7 +50,7 @@ public class BCryptUtil {
      * @return 是否正确
      */
     public static boolean verify(String text, String ciphertext) {
-        if (StringUtils.isEmpty(text) || StringUtils.isEmpty(ciphertext)) {
+        if (StringUtils.isAnyBlank(text, ciphertext)) {
             return false;
         }
         return BCrypt.checkpw(text, ciphertext);

@@ -112,7 +112,7 @@ public class CustomExceptionHandler implements ErrorWebExceptionHandler {
         if (ex instanceof BlockException) {
             httpStatus = HttpStatus.TOO_MANY_REQUESTS;
             // Too Many Request Server
-            body = JsonUtil.jsonObj2Str(Result.failure(httpStatus.value(), "前方拥挤，请稍后再试"));
+            body = JsonUtil.obj2Json(Result.failure(httpStatus.value(), "前方拥挤，请稍后再试"));
         } else {
             //ResponseStatusException responseStatusException = (ResponseStatusException) ex;
             //httpStatus = responseStatusException.getStatus();
@@ -120,7 +120,7 @@ public class CustomExceptionHandler implements ErrorWebExceptionHandler {
 
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             // Internal Server Error
-            body = JsonUtil.jsonObj2Str(Result.failure(httpStatus.value(), "调用失败，服务不可用"));
+            body = JsonUtil.obj2Json(Result.failure(httpStatus.value(), "调用失败，服务不可用"));
         }
         /**
          * 封装响应体,此body可修改为自己的jsonBody
@@ -141,12 +141,10 @@ public class CustomExceptionHandler implements ErrorWebExceptionHandler {
         }
         exceptionHandlerResult.set(result);
         ServerRequest newRequest = ServerRequest.create(exchange, this.messageReaders);
-        Mono<Void> mono = RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse).route(newRequest)
+        return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse).route(newRequest)
                 .switchIfEmpty(Mono.error(ex))
-                .flatMap((handler) -> handler.handle(newRequest))
-                .flatMap((response) -> write(exchange, response));
-        exceptionHandlerResult.remove();
-        return mono;
+                .flatMap(handler -> handler.handle(newRequest))
+                .flatMap(response -> write(exchange, response));
     }
 
     /**
@@ -154,6 +152,7 @@ public class CustomExceptionHandler implements ErrorWebExceptionHandler {
      */
     protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
         Map<String, Object> result = exceptionHandlerResult.get();
+        exceptionHandlerResult.remove();
         return ServerResponse.status((HttpStatus) result.get("httpStatus"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(result.get("body")));

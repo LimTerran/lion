@@ -28,6 +28,8 @@ import java.time.temporal.TemporalAdjusters;
  */
 public class DateUtil {
 
+    private DateUtil() {}
+
     /**
      * 自定义格式化
      */
@@ -554,5 +556,4 @@ public class DateUtil {
     public static Long toSelectEpochMilli(LocalDateTime localDateTime, ZoneId zoneId) {
         return localDateTime.atZone(zoneId).toInstant().toEpochMilli();
     }
-
 }
